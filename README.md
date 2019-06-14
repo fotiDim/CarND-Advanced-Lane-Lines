@@ -101,11 +101,11 @@ a. In the 7th code cell of the IPython notebook, we define a function to find th
 
 ![alt text][image6]
 
-b. In the 9th code cell of the IPython notebook we define a set of functions that will help us with line detections. Starting with the positions detected from the histogram we follow the lines using the sliding window technique (`sliding_windows_search()`). This technique is used on the first frame of a video.
+b. In the 9th code cell of the IPython notebook we define a set of functions that will help us with line detections. Starting with the positions detected from the histogram we follow the lines using the sliding window technique (`sliding_windows_search()`). This technique is used on the first frame of a video. Within this step we perform a sanity check to make sure that recongized lane width is reasonable.
 
 ![alt text][image7]
 
-c. After we have a set of points we can polyfit a polynominal using `fit_polynomial()` which returns us the polynomial of each lane.
+c. After we have a set of points we can polyfit a polynominal using `fit_polynomial()` which returns us the polynomial of each lane. Within this step we perform a sanity check to make sure that the second degree parameters of both fits are not too different.
 
 ![alt text][image9]
 
@@ -140,10 +140,9 @@ Here's a [link to my video result](./output_videos/project_video.mp4)
 #### 1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?
 
 What worked:
+  - Sanity check and smoothing worked nicely to improve the end result
+  - I had to narrow down the margin when searching around lines of previous frames
 What could potentially not work and can be improved:
-  - Heavy shadows and lens glare seem to confuse the lane detection. Tampering with the several coefficients could improved that.
-  - Dashed lanes sometimes we're not very thoroughly detected. I would try to take a bit larger interest area when I am doing the birds eye view transformation so that I maximize the chance to include more line segments. I would also experiment with different coefficients to get a better threshold binary image.
-  - In general, I went for a simpler approach, as I wanted to see the real power of the pipeline. I didn't make use of all the properties included in the Lane class. Smoothing the lanes using detected values from multiple frames could be one thing that would be interesting but before going down that road I would like to find tune the pipeline before resorting to tricks.
+  - In general, I went for a simpler approach, as I wanted to see the real power of the pipeline. I didn't make use of all the properties included in the Lane class. I did really sublte smoothing taking only into account the last 2 successfully recognized frames.
   - Sometimes one of the two lanes is not detected due to lack of enough points. The non found lane could be deducted from its found counterpart, given that lanes are always parallel and with the same distance between them. The distance can also be dynamically calculated from the previous frames.
   - The previous scenario is particularly evident when the curvature is too high and on of the lanes is "lost" to the outer side of the image. The previously described technique would probably work for this scenario as well
-  - Sanity checks on the calculated values were done manually. They could also be setup in code, raising exceptions when the values do not make sense and require deeper inspection.
